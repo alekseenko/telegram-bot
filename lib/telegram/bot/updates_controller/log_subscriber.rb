@@ -8,7 +8,7 @@ module Telegram
           info do
             payload = event.payload
             "Processing by #{payload[:controller]}##{payload[:action]}\n" \
-            "  Update: #{payload[:update].to_json}"
+            "  Update: #{params_filter.filter(payload[:update]).to_json}"
           end
         end
 
@@ -32,6 +32,14 @@ module Telegram
 
         delegate :logger, to: UpdatesController
         attach_to 'updates_controller.bot.telegram'
+
+        private
+
+        def params_filter
+          @_params_filter ||= ActionDispatch::Http::ParameterFilter.new(
+            Rails.application.config.filter_parameters
+          )
+        end
       end
     end
   end
